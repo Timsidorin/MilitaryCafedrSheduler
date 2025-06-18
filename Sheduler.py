@@ -38,7 +38,6 @@ class Sheduler():
                 return record
 
     async def close(self):
-        """Закрывает пул соединений при завершении работы."""
         if self.pool:
             await self.pool.close()
 
