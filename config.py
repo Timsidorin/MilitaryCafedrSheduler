@@ -12,6 +12,8 @@ class Configs(BaseSettings):
     DB_NAME: Optional[str] = Field(default="postgres", env="DB_NAME")
     DB_PASS: Optional[str] = Field(default="admin", env="DB_PASS")
 
+    BOT_TOKEN: Optional[str] = Field(default="7634039507:AAFNLmRS8IwmXZQ4WK_zBQUURq7Ak2VxuS4", env="BOT_TOKEN")
+
 configs = Configs()
 
 def get_db_url():
