@@ -3,6 +3,11 @@ from pydantic import Field
 from typing import Optional
 import os
 
+from dataclasses import dataclass
+
+
+
+
 
 class Configs(BaseSettings):
     # ------------ БД ------------
@@ -15,6 +20,17 @@ class Configs(BaseSettings):
     BOT_TOKEN: Optional[str] = Field(default="7634039507:AAFNLmRS8IwmXZQ4WK_zBQUURq7Ak2VxuS4", env="BOT_TOKEN")
 
 configs = Configs()
+
+
+
+@dataclass
+class CronScheduleSettings:
+    day_of_week: int = 2   # Среда (отсчёт дней недели с нуля)
+    hour: int = 19         #  ->
+                                # 19:00
+    minute: int = 0        #  ->
+
+
 
 def get_db_url():
     return (
