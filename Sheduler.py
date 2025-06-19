@@ -35,7 +35,7 @@ class Sheduler():
                 query = f"UPDATE {self.table_name} SET currentstatus = '0'"
                 await connection.fetchrow(query)
             if record:
-                return record
+                return record["name"]
 
     async def close(self):
         if self.pool:

@@ -33,9 +33,8 @@ async def scheduled_message(chat_id: int):
     query_scheduler = Sheduler("public.cursants")
     try:
         await query_scheduler.initialize()
-        cursant = await query_scheduler.can_choice()
-        cursant_name_formatted = f"<b>{cursant['name']}</b>"
+        cursant_name =   f"<b>{await query_scheduler.can_choice()}</b>"
     finally:
         await query_scheduler.close()
 
-    await send_message(chat_id, f"Дежурный на завтра курсант: {cursant_name_formatted}")
+    await send_message(chat_id, f"Дежурный на завтра курсант: {cursant_name}")
