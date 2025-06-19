@@ -16,7 +16,7 @@ class Sheduler():
                 query = f'SELECT COUNT(*) FROM {self.table_name}'
                 self.count = await connection.fetchval(query)
 
-    async def can_choice(self):
+    async def can_choice(self) ->str:
         async with self.pool.acquire() as connection:
             query = f"""
                 UPDATE {self.table_name}

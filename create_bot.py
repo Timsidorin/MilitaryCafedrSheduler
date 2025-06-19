@@ -11,11 +11,8 @@ from config import configs
 
 
 
-scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
-
-
+scheduler = AsyncIOScheduler()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
 bot = Bot(token=configs.BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher(storage=MemoryStorage())
