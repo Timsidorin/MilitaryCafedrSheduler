@@ -4,7 +4,10 @@ from aiogram.types import Message
 from create_bot import bot, scheduler
 from Sheduler import Sheduler
 from config import  CronScheduleSettings as cr
+from config import configs
 import logging
+
+from keyboards.admin_keyboard import admin_keyboard
 
 start_router = Router()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -15,9 +18,21 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 @start_router.message(CommandStart())
 async def cmd_start(message: Message):
     chat_id = message.chat.id
+    user_id = message.from_user.id
     scheduler.add_job(scheduled_message, 'interval', seconds=5, args=[chat_id])
     #scheduler.add_job(scheduled_message, 'cron',  day_of_week=cr.day_of_week, hour = cr.hour, minute = cr.minute, args=[chat_id])
-    await message.answer('Привет! Я буду автоматически отправлять расписание дежурств и нарядов 221 уч.взвода')
+    if str(user_id) in configs.ADMINS:
+        await message.answer(
+            'Привет! Я буду автоматически отправлять расписание дежурств и нарядов 221 уч.взвода.\n\n'
+            '🔧 <b>Панель администратора доступна:</b>',
+            reply_markup=admin_keyboard,
+            parse_mode='HTML'
+        )
+
+    else:
+        await message.answer(
+            'Привет! Я буду автоматически отправлять расписание дежурств и нарядов 221 уч.взвода.', parse_mode='HTML')
+
 
 
 
