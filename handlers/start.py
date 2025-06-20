@@ -15,7 +15,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 @start_router.message(CommandStart())
 async def cmd_start(message: Message):
     chat_id = message.chat.id
-    scheduler.add_job(scheduled_message, 'cron',  day_of_week=cr.day_of_week, hour = cr.hour, minute = cr.minute, args=[chat_id])
+    scheduler.add_job(scheduled_message, 'interval', seconds=5, args=[chat_id])
+    #scheduler.add_job(scheduled_message, 'cron',  day_of_week=cr.day_of_week, hour = cr.hour, minute = cr.minute, args=[chat_id])
     await message.answer('Привет! Я буду автоматически отправлять расписание дежурств и нарядов 221 уч.взвода')
 
 
@@ -33,8 +34,10 @@ async def scheduled_message(chat_id: int):
     query_scheduler = Sheduler("public.cursants")
     try:
         await query_scheduler.initialize()
-        cursant_name =   f"<b>{await query_scheduler.can_choice()}</b>"
+        cursant =await query_scheduler.can_choice()
+        cursant_name = f"<b>{cursant['name']}</b>"
+        cursant_tg = cursant['telegram_name']
     finally:
         await query_scheduler.close()
 
-    await send_message(chat_id, f"Дежурный на завтра курсант: {cursant_name}")
+    await send_message(chat_id, f"Дежурный на завтра курсант: {cursant_name} @{cursant_tg}")
