@@ -17,7 +17,7 @@ class Configs(BaseSettings):
     DB_NAME: Optional[str] = Field(default="military", env="DB_NAME")
     DB_PASS: Optional[str] = Field(default="admin", env="DB_PASS")
 
-    BOT_TOKEN: Optional[str] = Field(default="7634039507:AAFNLmRS8IwmXZQ4WK_zBQUURq7Ak2VxuS4", env="BOT_TOKEN")
+    BOT_TOKEN: Optional[str] = Field(default="7235849573:AAHBKmG4FYL-DFv7etvsRJYrXrVf2JxuW7A", env="BOT_TOKEN")
     ADMINS: Optional[List[str]] = Field(default=["1007781768"], env="ADMINS")
 
 
@@ -28,7 +28,7 @@ configs = Configs()
 
 @dataclass
 class CronScheduleSettings:
-    day_of_week: int = 2   # Среда (отсчёт дней недели с нуля)
+    day_of_week: int = 1   # Среда (отсчёт дней недели с нуля)
     hour: int = 19         #  ->
                                 # 19:00
     minute: int = 0        #  ->

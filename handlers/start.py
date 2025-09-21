@@ -19,8 +19,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 async def cmd_start(message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
-    scheduler.add_job(scheduled_message, 'interval', seconds=5, args=[chat_id])
-    #scheduler.add_job(scheduled_message, 'cron',  day_of_week=cr.day_of_week, hour = cr.hour, minute = cr.minute, args=[chat_id])
+    scheduler.add_job(scheduled_message, 'cron',  day_of_week=cr.day_of_week, hour = cr.hour, minute = cr.minute, args=[chat_id])
     if str(user_id) in configs.ADMINS:
         await message.answer(
             'Привет! Я буду автоматически отправлять расписание дежурств и нарядов 221 уч.взвода.\n\n'
