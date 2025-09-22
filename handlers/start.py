@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 from create_bot import bot, scheduler
-from Sheduler import Sheduler
+from Sheduler import Scheduler
 from config import  CronScheduleSettings as cr
 from config import configs
 import logging
@@ -20,6 +20,7 @@ async def cmd_start(message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
     scheduler.add_job(scheduled_message, 'cron',  day_of_week=cr.day_of_week, hour = cr.hour, minute = cr.minute, args=[chat_id])
+
     if str(user_id) in configs.ADMINS:
         await message.answer(
             'Привет! Я буду автоматически отправлять расписание дежурств и нарядов 221 уч.взвода.\n\n'
@@ -45,7 +46,7 @@ async def send_message(chat_id: int, text: str):
 
 
 async def scheduled_message(chat_id: int):
-    query_scheduler = Sheduler("public.cursants")
+    query_scheduler = Scheduler("public.cursants")
     try:
         await query_scheduler.initialize()
         cursant =await query_scheduler.can_choice()
