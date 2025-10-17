@@ -18,29 +18,11 @@ class Scheduler:
             cls.max_id = await cls.pool.fetchval(f'SELECT COALESCE(MAX(id), 0) FROM {cls.table_name}')
 
     @classmethod
-    async def can_choice_duty(cls) -> Optional[dict]:
-        """Выбирает 1 курсанта для дежурства"""
-        async with cls.pool.acquire() as conn:
-            async with conn.transaction():
-                record = await conn.fetchrow(f"""
-                    UPDATE {cls.table_name} SET currentstatus = '1'
-                    WHERE id = (
-                        SELECT id FROM {cls.table_name}
-                        WHERE currentstatus = '0'
-                        ORDER BY id ASC LIMIT 1
-                        FOR UPDATE SKIP LOCKED
-                    )
-                    RETURNING id, name, telegram_name
-                """)
-
-                if record and record['id'] == cls.max_id:
-                    await conn.execute(f"UPDATE {cls.table_name} SET currentstatus = '0'")
-
-                return dict(record) if record else None
-
-    @classmethod
-    async def can_choice_naryad(cls) -> Optional[list]:
-        """Выбирает 3 курсантов для наряда"""
+    async def choice(cls, count: int = 1) -> Optional[list]:
+        """
+        Выбирает курсантов для дежурства/наряда
+        count=1 для дежурного, count=3 для наряда
+        """
         async with cls.pool.acquire() as conn:
             async with conn.transaction():
                 records = await conn.fetch(f"""
@@ -48,7 +30,7 @@ class Scheduler:
                     WHERE id IN (
                         SELECT id FROM {cls.table_name}
                         WHERE currentstatus = '0'
-                        ORDER BY id ASC LIMIT 3
+                        ORDER BY id ASC LIMIT {count}
                         FOR UPDATE SKIP LOCKED
                     )
                     RETURNING id, name, telegram_name
@@ -69,8 +51,6 @@ class Scheduler:
 async def main():
     await Scheduler.init()
 
-
 if __name__ == "__main__":
     import asyncio
-
     asyncio.run(main())
