@@ -3,7 +3,7 @@ from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 from create_bot import bot, scheduler
 from Sheduler import Scheduler
-from config import  CronScheduleSettings as cr
+from config import  CronScheduleDutySettings, CronScheduleDutySettings
 from config import configs
 import logging
 
@@ -19,7 +19,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 async def cmd_start(message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
-    scheduler.add_job(scheduled_message, 'cron',  day_of_week=cr.day_of_week, hour = cr.hour, minute = cr.minute, args=[chat_id])
+    scheduler.add_job(scheduled_message_duty, 'cron',  day_of_week=CronScheduleDutySettings.day_of_week, hour = CronScheduleDutySettings.hour, minute = CronScheduleDutySettings.minute, args=[chat_id]) # Дежурство
+    scheduler.add_job(scheduled_message_naryad, 'cron',  day_of_week=CronScheduleDutySettings.day_of_week, hour = CronScheduleDutySettings.hour, minute = CronScheduleDutySettings.minute, args=[chat_id]) # наряд
 
     if str(user_id) in configs.ADMINS:
         await message.answer(
@@ -35,8 +36,6 @@ async def cmd_start(message: Message):
 
 
 
-
-
 async def send_message(chat_id: int, text: str):
     try:
 
@@ -45,14 +44,38 @@ async def send_message(chat_id: int, text: str):
         logging.error(f"Ошибка при отправке сообщения: {e}")
 
 
-async def scheduled_message(chat_id: int):
+async def scheduled_message_duty(chat_id: int):
     query_scheduler = Scheduler("public.cursants")
     try:
         await query_scheduler.initialize()
-        cursant =await query_scheduler.can_choice()
+        cursant =await query_scheduler.can_choice_duty()
         cursant_name = f"<b>{cursant['name']}</b>"
         cursant_tg = cursant['telegram_name']
     finally:
         await query_scheduler.close()
 
     await send_message(chat_id, f"Дежурный на завтра курсант: {cursant_name} @{cursant_tg}")
+
+
+
+async def scheduled_message_naryad(chat_id: int):
+    query_scheduler = Scheduler("public.cursants")
+    try:
+        await query_scheduler.initialize()
+        cursants = await query_scheduler.can_choice_naryad()
+        cursants_name = f"<b>{cursants['name']}</b>"
+        cursants_tg = cursants['telegram_name']
+    finally:
+        await query_scheduler.close()
+    await send_message(chat_id, f"В наряд идут: {cursants_name} @{cursants_tg}")
+
+
+
+
+
+
+
+
+
+
+

@@ -34,7 +34,7 @@ class Scheduler:
                 query = f'SELECT COALESCE(MAX(id), 0) FROM {self.table_name}'
                 self.max_id = await connection.fetchval(query)
 
-    async def can_choice(self) -> Optional[dict]:
+    async def can_choice_duty(self) -> Optional[dict]:
         """
         Выбирает следующего курсанта по порядку ID.
         Возвращает информацию о выбранном курсанте или None.
@@ -72,6 +72,48 @@ class Scheduler:
                     'name': record['name'],
                     'telegram_name': record['telegram_name']
                 }
+
+    async def can_choice_naryad(self) -> Optional[list]:
+        """
+        Выбирает курсантов для наряда
+        """
+        if not self.pool:
+            await self.initialize()
+
+        async with self.pool.acquire() as connection:
+            async with connection.transaction():
+                # Выбираем 3 курсантов с минимальными ID и статусом '0'
+                update_query = f"""
+                    UPDATE {self.table_name}
+                    SET currentstatus = '1'
+                    WHERE id IN (
+                        SELECT id FROM {self.table_name}
+                        WHERE currentstatus = '0'
+                        ORDER BY id ASC
+                        LIMIT 3
+                        FOR UPDATE SKIP LOCKED
+                    )
+                    RETURNING id, name, telegram_name;
+                """
+                records = await connection.fetch(update_query)
+
+                if not records:
+                    return None
+
+                # Проверяем, есть ли среди выбранных последний курсант
+                selected_ids = [record['id'] for record in records]
+                if self.max_id in selected_ids:
+                    reset_query = f"UPDATE {self.table_name} SET currentstatus = '0'"
+                    await connection.execute(reset_query)
+
+                return [
+                    {
+                        'id': record['id'],
+                        'name': record['name'],
+                        'telegram_name': record['telegram_name']
+                    }
+                    for record in records
+                ]
 
     async def get_all_cursants(self) -> list:
         """Получить всех курсантов в правильном порядке по ID"""

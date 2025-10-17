@@ -27,12 +27,22 @@ configs = Configs()
 
 
 @dataclass
-class CronScheduleSettings:
-    day_of_week: int = 1   # Среда (отсчёт дней недели с нуля)
+class CronScheduleDutySettings:
+    """ Временные настройки для дежурства"""
+    day_of_week: int = 1   # Вторник (отсчёт дней недели с нуля)
     hour: int = 19         #  ->
                                 # 19:00
     minute: int = 0        #  ->
 
+
+
+@dataclass
+class CronScheduleNaryadSettings:
+    """ Временные настройки для наряда"""
+    day_of_week: int = 2   # Среда (отсчёт дней недели с нуля)
+    hour: int = 20         #  ->
+                                # 19:00
+    minute: int = 0        #  ->
 
 
 def get_db_url():
